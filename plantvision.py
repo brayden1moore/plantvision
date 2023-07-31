@@ -40,7 +40,7 @@ class PlantVision(nn.Module):
         output = self.fc(output)
         return output
 
-device = ('cuda' if torch.cuda.is_available else 'cpu')
+device = 'cpu' # ('cuda' if torch.cuda.is_available else 'cpu')
 
 with open(fr'{THIS_FOLDER}/resources/flowerLabelSet.pkl', 'rb') as f:
         flowerLabelSet = pkl.load(f)
