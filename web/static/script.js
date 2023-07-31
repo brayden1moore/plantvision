@@ -7,6 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function handleImageUpload(file) {
     const predictedImagesContainer = document.getElementById("predicted-images");
     predictedImagesContainer.innerHTML = "";
+
+    const imageElement = document.createElement("img");
+    imageElement.src = "static/loading.gif";
+    predictedImagesContainer.appendChild(imageElement);
+
     const selectedFeature = featureSelect.value;
     const formData = new FormData();
     thinkingText.innerText = "One sec, thinking...";
@@ -29,9 +34,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const uploadedImage = new Image();
+
       uploadedImage.src = reader.result;
       uploadedImage.classList.add("uploaded-image");
-      uploadedImage.onload = () => {
+      uploadedImage.onload = async () => {
+
         const dropzoneWidth = dropzone.offsetWidth;
         const dropzoneHeight = dropzone.offsetHeight;
         const imageWidth = uploadedImage.width;
@@ -98,6 +105,8 @@ function displayResults(data) {
     const imageUrl = data.images[i];
     const predictionUrl = data.predictions[i];
     const name = data.names[i];
+    const species = data.species[i];
+    const confidence = data.confidences[i];
 
     // Create a container div for each image and its anchor
     const imageContainer = document.createElement("div");
@@ -107,6 +116,16 @@ function displayResults(data) {
     anchorElement.href = predictionUrl;
     anchorElement.target = "_blank"; // Open the link in a new tab
 
+    // Create the caption element
+    const captionElement = document.createElement("div");
+    captionElement.classList.add("image-caption");
+    captionElement.textContent = name; // Use the name from the 'names' list as the caption text
+
+    // Create the caption element
+    const speciesElement = document.createElement("div");
+    speciesElement.classList.add("image-species");
+    speciesElement.textContent = species; // Use the name from the 'names' list as the caption text
+
     // Create the image element
     const imageElement = document.createElement("img");
     // Add cache-busting parameter to the image URL
@@ -115,16 +134,16 @@ function displayResults(data) {
 
     const tooltip = document.createElement("div");
     tooltip.classList.add("image-tooltip");
-    tooltip.textContent = name; // Use the name from the 'names' list as the tooltip text
+    tooltip.textContent = species; // Use the name from the 'names' list as the tooltip text
 
     // Append the image to the anchor and the anchor to the container
     anchorElement.appendChild(imageElement);
+    anchorElement.appendChild(captionElement);
     imageContainer.appendChild(tooltip);
     imageContainer.appendChild(anchorElement);
 
     // Append the container to the predictedImagesContainer
     predictedImagesContainer.appendChild(imageContainer);
-
 
     // Add the tooltip element to the document body
     document.body.appendChild(tooltip);
@@ -143,6 +162,7 @@ function displayResults(data) {
       tooltip.style.left = event.pageX + "px";
       tooltip.style.top = event.pageY + "px";
     });
+
   }
 }
 
