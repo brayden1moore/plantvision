@@ -52,17 +52,17 @@ with open(fr'{THIS_FOLDER}/resources/fruitLabelSet.pkl', 'rb') as f:
         fruitLabelSet = pkl.load(f)
 
 flower = PlantVision(num_classes=len(flowerLabelSet))
-flowerUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantnet-model-flower.pt"
+flowerUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower.pt"
 flowerBytes = BytesIO(requests.get(flowerUrl).content)
 flower.load_state_dict(torch.load(flowerBytes, map_location=torch.device(device)), strict=False)
 
 leaf = PlantVision(num_classes=len(leafLabelSet))
-leafUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantnet-model-leaf.pt"
+leafUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-leaf.pt"
 leafBytes = BytesIO(requests.get(leafUrl).content)
 leaf.load_state_dict(torch.load(leafBytes, map_location=torch.device(device)), strict=False)
 
 fruit = PlantVision(num_classes=len(fruitLabelSet))
-fruitUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantnet-model-fruit.pt"
+fruitUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-fruit.pt"
 fruitBytes = BytesIO(requests.get(fruitUrl).content)
 fruit.load_state_dict(torch.load(fruitBytes, map_location=torch.device(device)), strict=False)
 
