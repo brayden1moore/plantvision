@@ -56,24 +56,6 @@ def guess():
         with open(f'{THIS_FOLDER}/resources/{feature}speciesIndexDict.pkl','rb') as f:
             speciesNameToIndex = pkl.load(f)
 
-        #urls = []
-        #predictedImages = []
-        #for p in predictions:
-        #    key = speciesNameToKey[p]
-        #    img = speciesNameToIndex[p]
-        #    query = ''
-        #    for i in p.split(' '):
-        #        query += i 
-        #        query += '+'
-        #    urls.append(f'https://www.google.com/search?q={query[:-1]}')
-        #    predictedImages.append(f'{THIS_FOLDER}/images/img{img}.jpeg')
-        
-        #predicted_image_urls = []
-        #for i,image in enumerate(predictedImages):
-        #    blob = bucket.blob(f"{session['sessionId']}_{i}.jpeg")
-        #    blob.upload_from_filename(image)
-        #    predicted_image_urls.append(f"https://storage.googleapis.com/bmllc-plant-image-bucket/{session['sessionId']}_{i}.jpeg")
-
         urls = []
         predictedImages = []
         for p in predictions:
@@ -81,16 +63,34 @@ def guess():
             img = speciesNameToIndex[p]
             query = ''
             for i in p.split(' '):
-                query += i
+                query += i 
                 query += '+'
             urls.append(f'https://www.google.com/search?q={query[:-1]}')
-            #urls.append(f'https://www.gbif.org/species/{key}')
-            predictedImages.append(Image.open(f'{THIS_FOLDER}/images-highres/img{img}.jpeg'))
-
+            predictedImages.append(f'{THIS_FOLDER}/images/img{img}.jpeg')
+        
+        predicted_image_urls = []
         for i,image in enumerate(predictedImages):
-            image.save(f'{THIS_FOLDER}/web/static/predicted-images/{session['sessionId']}_{i}.jpeg', "JPEG")
+            blob = bucket.blob(f"{session['sessionId']}_{i}.jpeg")
+            blob.upload_from_filename(image)
+            predicted_image_urls.append(f"https://storage.googleapis.com/bmllc-plant-image-bucket/{session['sessionId']}_{i}.jpeg")
 
-        predicted_image_urls = [url_for(f'static', filename=f'predicted-images/{session['sessionId']}_{i}.jpeg') for i in range(len(predictedImages))]
+        #urls = []
+        #predictedImages = []
+        #for p in predictions:
+        #    key = speciesNameToKey[p]
+        #    img = speciesNameToIndex[p]
+        #    query = ''
+        #    for i in p.split(' '):
+        #        query += i
+        #        query += '+'
+        #    urls.append(f'https://www.google.com/search?q={query[:-1]}')
+        #    #urls.append(f'https://www.gbif.org/species/{key}')
+        #    predictedImages.append(Image.open(f'{THIS_FOLDER}/images-highres/img{img}.jpeg'))
+
+        #for i,image in enumerate(predictedImages):
+        #    image.save(f'{THIS_FOLDER}/web/static/predicted-images/{session['sessionId']}_{i}.jpeg', "JPEG")
+
+        #predicted_image_urls = [url_for(f'static', filename=f'predicted-images/{session['sessionId']}_{i}.jpeg') for i in range(len(predictedImages))]
 
         names = []
         for p in predictions:
