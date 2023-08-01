@@ -7,7 +7,7 @@ credentials_dict = {
     'client_id': os.environ['CLIENT_ID'],
     'client_email': os.environ['CLIENT_EMAIL'],
     'private_key_id': os.environ['PRIVATE_KEY_ID'],
-    'private_key': os.environ['PRIVATE_KEY'],
+    'private_key': os.environ['PRIVATE_KEY'].replace('\\n', '\n'),
 }
 
 credentials = ServiceAccountCredentials.from_json_keyfile_dict(
