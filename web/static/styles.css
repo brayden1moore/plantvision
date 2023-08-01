@@ -79,10 +79,6 @@ body {
   margin-top: 10px;
 }
 
-#image-container {
-  transition: 0.3s;
-}
-
 /* The container for the predicted images */
 #predicted-images {
   display: grid;
