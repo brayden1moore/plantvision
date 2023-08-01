@@ -72,7 +72,7 @@ def guess():
         for i,image in enumerate(predictedImages):
             blob = bucket.blob(f"{session['sessionId']}_{i}.jpeg")
             blob.upload_from_filename(image)
-            predicted_image_urls.append(f"https://storage.cloud.google.com/bmllc-plant-image-bucket/{session['sessionId']}_{i}.jpeg")
+            predicted_image_urls.append(f"https://storage.googleapis.com/bmllc-plant-image-bucket/{session['sessionId']}_{i}.jpeg")
 
         names = []
         for p in predictions:
