@@ -20,7 +20,7 @@ body {
 
 .container {
   margin-top: 120px;
-  height: 600px;
+  height: auto;
   top: 100px;
   display: flex;
   justify-content: space-around;
