@@ -70,7 +70,7 @@ def processImage(imagePath, feature):
     with open(fr'{THIS_FOLDER}/resources/{feature}MeansAndStds.pkl', 'rb') as f:
         meansAndStds = pkl.load(f)
 
-    img = Image.open(imagePath)
+    img = Image.open(imagePath).convert('RGB')
     cropped = ImageOps.fit(img, (224,224), Image.Resampling.LANCZOS)
 
     process = T.Compose([
