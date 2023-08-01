@@ -129,8 +129,10 @@ function displayResults(data) {
     const imageElement = document.createElement("img");
     // Add cache-busting parameter to the image URL
     const cacheBustUrl = imageUrl + `?cache=${Date.now()}`;
+    // Set the lazy loading attribute
+    imageElement.loading = "lazy";
     // Set the data-src attribute with the cache-busted URL
-    imageElement.setAttribute("data-src", cacheBustUrl);
+    imageElement.src = cacheBustUrl;
 
     const tooltip = document.createElement("div");
     tooltip.classList.add("image-tooltip");
