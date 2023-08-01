@@ -47,6 +47,7 @@ body {
 
 .dropzone {
   width: 52%;
+  height: 700px;
   border: 2px solid #000000;
   display: flex;
   justify-content: center;
