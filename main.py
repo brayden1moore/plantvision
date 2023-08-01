@@ -27,8 +27,8 @@ def guess():
         feature = request.form.get('feature')
 
         tensor = plantvision.processImage(img, feature)
-        predictions, confidences = plantvision.see(tensor, feature, 9)
-        confidences = [f'{str(round(i*100,4))}%' for i in confidences]
+        predictions = plantvision.see(tensor, feature, 9)
+        #confidences = [f'{str(round(i*100,4))}%' for i in confidences]
 
         with open(f'{THIS_FOLDER}/resources/speciesNameToKey.pkl','rb') as f:
             speciesNameToKey = pkl.load(f)
@@ -66,8 +66,7 @@ def guess():
             'names': names,
             'species': predictions,
             'predictions': urls,
-            'images': predicted_image_urls,
-            'confidences': confidences
+            'images': predicted_image_urls
         }
 
         return jsonify(response)
