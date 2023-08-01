@@ -1,3 +1,21 @@
+from gcloud import storage
+from oauth2client.service_account import ServiceAccountCredentials
+import os
+
+credentials_dict = {
+    'type': 'service_account',
+    'client_id': os.environ['CLIENT_ID'],
+    'client_email': os.environ['CLIENT_EMAIL'],
+    'private_key_id': os.environ['PRIVATE_KEY_ID'],
+    'private_key': os.environ['PRIVATE_KEY'],
+}
+
+credentials = ServiceAccountCredentials.from_json_keyfile_dict(
+    credentials_dict
+)
+client = storage.Client(credentials=credentials, project='bmllc-plant')
+bucket = client.get_bucket('bmllc-plant-image-bucket')
+
 import plantvision
 import pickle as pkl
 from flask import Flask, render_template, request, session, jsonify, url_for
@@ -47,13 +65,13 @@ def guess():
                 query += i 
                 query += '+'
             urls.append(f'https://www.google.com/search?q={query[:-1]}')
-            #urls.append(f'https://www.gbif.org/species/{key}')
-            predictedImages.append(Image.open(f'{THIS_FOLDER}/images/img{img}.jpeg'))
+            predictedImages.append(f'{THIS_FOLDER}/images/img{img}.jpeg')
 
+        predicted_image_urls = []
         for i,image in enumerate(predictedImages):
-            image.save(f'{THIS_FOLDER}/web/static/predicted-images/img{i}.jpeg', "JPEG")
-
-        predicted_image_urls = [url_for(f'static', filename=f'predicted-images/img{i}.jpeg') for i in range(len(predictedImages))]
+            blob = bucket.blob(f"{session['sessionId']}_{i}.jpeg")
+            blob.upload_from_filename(image)
+            predicted_image_urls.append(f"https://storage.cloud.google.com/bmllc-plant-image-bucket/{session['sessionId']}_{i}.jpeg")
 
         names = []
         for p in predictions:
