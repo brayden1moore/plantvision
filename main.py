@@ -21,6 +21,7 @@ import pickle as pkl
 from flask import Flask, render_template, request, session, jsonify, url_for
 from PIL import Image
 import os
+import time
 import random
 from pathlib import Path
 THIS_FOLDER = Path(__file__).parent.resolve()
@@ -87,6 +88,7 @@ def guess():
             'images': predicted_image_urls
         }
 
+        time.sleep(0.3)
         return jsonify(response)
 
 if __name__ == '__main__':
