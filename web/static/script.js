@@ -145,10 +145,11 @@ function displayResults(data) {
     imageContainer.appendChild(anchorElement);
     captionElement.style.opacity = "0";
     captionElement.style.opacity = "1";
+    
 
     // Append the container to the predictedImagesContainer
     predictedImagesContainer.appendChild(imageContainer);
-
+    
     // Add the tooltip element to the document body
     document.body.appendChild(tooltip);
 
@@ -166,7 +167,8 @@ function displayResults(data) {
       tooltip.style.left = event.pageX + "px";
       tooltip.style.top = event.pageY + "px";
     });
-
+  predictedImagesContainer.style.width = 10%;
+  predictedImagesContainer.style.width = 100%;
   }
 }
 
