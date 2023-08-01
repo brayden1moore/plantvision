@@ -1,4 +1,4 @@
-from google.cloud import storage
+from gcloud import storage
 from oauth2client.service_account import ServiceAccountCredentials
 import os
 
