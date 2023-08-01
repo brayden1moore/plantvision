@@ -167,8 +167,6 @@ function displayResults(data) {
       tooltip.style.left = event.pageX + "px";
       tooltip.style.top = event.pageY + "px";
     });
-  predictedImagesContainer.style.width = 10%;
-  predictedImagesContainer.style.width = 100%;
   }
 }
 
