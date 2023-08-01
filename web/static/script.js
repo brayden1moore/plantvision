@@ -106,7 +106,6 @@ function displayResults(data) {
     const predictionUrl = data.predictions[i];
     const name = data.names[i];
     const species = data.species[i];
-    const confidence = data.confidences[i];
 
     // Create a container div for each image and its anchor
     const imageContainer = document.createElement("div");
