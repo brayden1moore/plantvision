@@ -46,7 +46,7 @@ def guess():
         feature = request.form.get('feature')
 
         tensor = plantvision.processImage(img, feature)
-        predictions = plantvision.see(tensor, feature, 9)
+        predictions = plantvision.see(tensor, feature, 6)
         #confidences = [f'{str(round(i*100,4))}%' for i in confidences]
 
         with open(f'{THIS_FOLDER}/resources/speciesNameToKey.pkl','rb') as f:
