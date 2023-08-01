@@ -79,40 +79,43 @@ body {
   margin-top: 10px;
 }
 
+#image-container {
+  transition: 0.3s;
+}
 
 /* The container for the predicted images */
 #predicted-images {
-display: grid;
-row-gap: 1%;
-column-gap: 1%;
-grid-template-columns: repeat(3, 1fr);
-grid-template-rows: repeat(3, fr);
-position: relative; /* Set the container as a relative positioning context */
+  display: grid;
+  row-gap: 1%;
+  column-gap: 1%;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, fr);
+  position: relative; /* Set the container as a relative positioning context */
 }
 
 /* The predicted image */
 #predicted-images img {
-width: 100%; 
-height: auto; 
-display: block; 
-align-items: center;
+  width: 100%; 
+  height: auto; 
+  display: block; 
+  align-items: center;
 }
 
 /* The tooltip */
 .image-tooltip {
-position: absolute;
-bottom: 100%; /* Position the tooltip above the image */
-left: 50%; /* Center the tooltip horizontally */
-transform: translate(0%, -60%); /* Center both horizontally and vertically */
-background-color: rgba(0, 0, 0, 0.6);
-padding-left: 10px;
-padding-right: 10px;
-padding-top: 10px;
-padding-bottom: 20px;
-color: white;
-font-size: 12px;
-pointer-events: none;
-opacity: 0; /* Initially set the tooltip to be transparent */
+  position: absolute;
+  bottom: 100%; /* Position the tooltip above the image */
+  left: 50%; /* Center the tooltip horizontally */
+  transform: translate(0%, -60%); /* Center both horizontally and vertically */
+  background-color: rgba(0, 0, 0, 0.6);
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 20px;
+  color: white;
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0; /* Initially set the tooltip to be transparent */
 }
 
 /* Apply the hover effect */
