@@ -84,7 +84,6 @@ body {
 #predicted-images {
   display: grid;
   row-gap: 1%;
-  height: 600px;
   column-gap: 1%;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, fr);
@@ -93,7 +92,8 @@ body {
 
 /* The predicted image */
 #predicted-images img {
-  width: 100%; 
+  width: 75%; 
+  height: auto;
   display: block; 
   align-items: center;
 }
