@@ -143,8 +143,8 @@ function displayResults(data) {
     anchorElement.appendChild(captionElement);
     imageContainer.appendChild(tooltip);
     imageContainer.appendChild(anchorElement);
-    imageContainer.style.width = "20%";
-    imageContainer.style.width = "100%";
+    captionElement.style.opacity = "0";
+    captionElement.style.opacity = "1";
 
     // Append the container to the predictedImagesContainer
     predictedImagesContainer.appendChild(imageContainer);
