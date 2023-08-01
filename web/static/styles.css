@@ -29,7 +29,7 @@ body {
 }
 
 .left-container {
-  width: 45%;
+  width: 52%;
   padding: 20px;
   text-align: center;
   align-items: center;
@@ -38,14 +38,14 @@ body {
 
 .right-container {
   margin-left:-2px;
-  width: 45%;
+  width: 48%;
   padding: 20px;
   border: 2px solid #000000;
   text-align: left;
 }
 
 .dropzone {
-  width: 55%;
+  width: 52%;
   height: 500px;
   border: 2px solid #000000;
   display: flex;
@@ -92,9 +92,10 @@ position: relative; /* Set the container as a relative positioning context */
 
 /* The predicted image */
 #predicted-images img {
-width: 100%; /* Set the image width to 90% of the grid cell */
-height: auto; /* Maintain aspect ratio */
-display: block; /* Remove any spacing below the image */
+width: 100%; 
+height: auto; 
+display: block; 
+align-items: center;
 }
 
 /* The tooltip */
@@ -102,23 +103,28 @@ display: block; /* Remove any spacing below the image */
 position: absolute;
 bottom: 100%; /* Position the tooltip above the image */
 left: 50%; /* Center the tooltip horizontally */
-transform: translate(-100%, 50%); /* Center both horizontally and vertically */
+transform: translate(0%, -60%); /* Center both horizontally and vertically */
 background-color: rgba(0, 0, 0, 0.6);
-padding-left: 14px;
-padding-right: 14px;
-padding-top: 14px;
-padding-bottom: 28px;
+padding-left: 10px;
+padding-right: 10px;
+padding-top: 10px;
+padding-bottom: 20px;
 color: white;
-font-size: 14px;
+font-size: 12px;
 pointer-events: none;
 opacity: 0; /* Initially set the tooltip to be transparent */
-transition: opacity 0.3s;
 }
 
 /* Apply the hover effect */
+#predicted-images img {
+  /* Set initial transition properties */
+  transition: all 0.3s ease-in-out;
+  transform: scale(1); /* Set the initial scale to 1 (normal size) */
+}
+
 #predicted-images img:hover {
-filter: brightness(70%); /* Darken the image on hover */
-transition: 0.3s;
+  filter: brightness(70%);
+  transform: scale(1.07); /* Scale the image up to 1.1 times its original size on hover */
 }
 
 /* Show the tooltip on image hover */
@@ -127,4 +133,34 @@ opacity: 1; /* Make the tooltip visible on image hover */
 visibility: visible; /* Show the tooltip on image hover */
 }
 
+/* The caption */
+.image-caption {
+  bottom: 0;
+  left: 0;
+  width: 85%;
+  gap: 1%;
+  padding: 10px;
+  align-items: center;
+  text-decoration: none; 
+  font-size: 14px;
+  text-align: center;
+  font-weight: normal;
+  pointer-events: none; /* Prevent caption from blocking clicks */
+}
+
+.image-species {
+  opacity: 0;
+}
+
+#predicted-images a {
+  color: #4e4e4e;
+  text-decoration: none; 
+  font-weight: normal;
+}
+
+#predicted-images > div > a:hover .image-caption{
+  color: #000000;
+  font-size:  14px;
+  transition: 0.5s;
+}
 
