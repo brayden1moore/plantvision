@@ -32,7 +32,7 @@ Try it out [here](https://www.braydenmoore.com/plant).
 1. Clone this repository to your local machine using:
 
 ```bash
-git clone https://github.com/brayden1moore/What-Plant-Is-This.git
+git clone https://github.com/brayden1moore/plantvision.git
 cd What-Plant-Is-This
 ```
 
