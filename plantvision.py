@@ -57,12 +57,24 @@ with open(fr'{THIS_FOLDER}/resources/fruitLabelSet.pkl', 'rb') as f:
 
 flowerUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower.pt"
 flowerBytes = BytesIO(requests.get(flowerUrl).content)
+flower = PlantVision(num_classes=len(flowerLabelSet))
+flower.load_state_dict(torch.load(flowerBytes, map_location=torch.device(device)), strict=False)
+flowerBytes = None
+gc.collect()
 
 leafUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-leaf.pt"
 leafBytes = BytesIO(requests.get(leafUrl).content)
+leaf = PlantVision(num_classes=len(leafLabelSet))
+leaf.load_state_dict(torch.load(leafBytes, map_location=torch.device(device)), strict=False)
+leafBytes = None
+gc.collect()
 
 fruitUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-fruit.pt"
 fruitBytes = BytesIO(requests.get(fruitUrl).content)
+fruit = PlantVision(num_classes=len(fruitLabelSet))
+fruit.load_state_dict(torch.load(fruitBytes, map_location=torch.device(device)), strict=False)
+fruitBytes = None
+gc.collect()
 
 def processImage(imagePath, feature):
     with open(fr'{THIS_FOLDER}/resources/{feature}MeansAndStds.pkl', 'rb') as f:
@@ -85,16 +97,13 @@ def processImage(imagePath, feature):
 def see(tensor,feature,k):
 
     if feature=='flower':
-        model = PlantVision(num_classes=len(flowerLabelSet))
-        model.load_state_dict(torch.load(flowerBytes, map_location=torch.device(device)), strict=False)
+        model = flower
         labelSet = flowerLabelSet
     elif feature=='leaf':
-        model = PlantVision(num_classes=len(leafLabelSet))
-        model.load_state_dict(torch.load(leafBytes, map_location=torch.device(device)), strict=False)
+        model = leaf
         labelSet = leafLabelSet
     elif feature=='fruit':
-        model = PlantVision(num_classes=len(fruitLabelSet))
-        model.load_state_dict(torch.load(fruitBytes, map_location=torch.device(device)), strict=False)
+        model = fruit
         labelSet = fruitLabelSet
 
     with torch.no_grad():
