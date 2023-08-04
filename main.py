@@ -58,6 +58,7 @@ def guess():
 
         urls = []
         predictedImages = []
+        predicted_image_urls = []
         for p in predictions:
             key = speciesNameToKey[p]
             img = speciesNameToIndex[p]
@@ -66,13 +67,14 @@ def guess():
                 query += i 
                 query += '+'
             urls.append(f'https://www.google.com/search?q={query[:-1]}')
-            predictedImages.append(f'{THIS_FOLDER}/images/img{img}.jpeg')
+            #predictedImages.append(f'{THIS_FOLDER}/images/img{img}.jpeg')
+            predicted_image_urls.append(f"https://storage.googleapis.com/bmllc-images-bucket/images/img{img}.jpeg")
         
-        predicted_image_urls = []
-        for i,image in enumerate(predictedImages):
-            blob = bucket.blob(f"{session['sessionId']}_{i}.jpeg")
-            blob.upload_from_filename(image)
-            predicted_image_urls.append(f"https://storage.googleapis.com/bmllc-plant-image-bucket/{session['sessionId']}_{i}.jpeg")
+        #predicted_image_urls = []
+        #for i,image in enumerate(predictedImages):
+        #    blob = bucket.blob(f"{session['sessionId']}_{i}.jpeg")
+        #    blob.upload_from_filename(image)
+        #    predicted_image_urls.append(f"https://storage.googleapis.com/bmllc-plant-image-bucket/{session['sessionId']}_{i}.jpeg")
 
         #urls = []
         #predictedImages = []
