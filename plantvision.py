@@ -51,6 +51,11 @@ with open(fr'{THIS_FOLDER}/resources/leafLabelSet.pkl', 'rb') as f:
 with open(fr'{THIS_FOLDER}/resources/fruitLabelSet.pkl', 'rb') as f:
         fruitLabelSet = pkl.load(f)
 
+flower = PlantVision(num_classes=len(flowerLabelSet))
+flowerUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower.pt"
+flowerBytes = BytesIO(requests.get(flowerUrl).content)
+flower.load_state_dict(torch.load(flowerBytes, map_location=torch.device(device)), strict=False)
+
 def processImage(imagePath, feature):
     with open(fr'{THIS_FOLDER}/resources/{feature}MeansAndStds.pkl', 'rb') as f:
         meansAndStds = pkl.load(f)
@@ -72,10 +77,6 @@ def processImage(imagePath, feature):
 def see(tensor,feature,k):
 
     if feature=='flower':
-        flower = PlantVision(num_classes=len(flowerLabelSet))
-        flowerUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower.pt"
-        flowerBytes = BytesIO(requests.get(flowerUrl).content)
-        flower.load_state_dict(torch.load(flowerBytes, map_location=torch.device(device)), strict=False)
         model = flower
         labelSet = flowerLabelSet
     elif feature=='leaf':
