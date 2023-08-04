@@ -51,21 +51,6 @@ with open(fr'{THIS_FOLDER}/resources/leafLabelSet.pkl', 'rb') as f:
 with open(fr'{THIS_FOLDER}/resources/fruitLabelSet.pkl', 'rb') as f:
         fruitLabelSet = pkl.load(f)
 
-flower = PlantVision(num_classes=len(flowerLabelSet))
-flowerUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower.pt"
-flowerBytes = BytesIO(requests.get(flowerUrl).content)
-flower.load_state_dict(torch.load(flowerBytes, map_location=torch.device(device)), strict=False)
-
-leaf = PlantVision(num_classes=len(leafLabelSet))
-leafUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-leaf.pt"
-leafBytes = BytesIO(requests.get(leafUrl).content)
-leaf.load_state_dict(torch.load(leafBytes, map_location=torch.device(device)), strict=False)
-
-fruit = PlantVision(num_classes=len(fruitLabelSet))
-fruitUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-fruit.pt"
-fruitBytes = BytesIO(requests.get(fruitUrl).content)
-fruit.load_state_dict(torch.load(fruitBytes, map_location=torch.device(device)), strict=False)
-
 def processImage(imagePath, feature):
     with open(fr'{THIS_FOLDER}/resources/{feature}MeansAndStds.pkl', 'rb') as f:
         meansAndStds = pkl.load(f)
@@ -87,14 +72,26 @@ def processImage(imagePath, feature):
 def see(tensor,feature,k):
 
     if feature=='flower':
-         model = flower
-         labelSet = flowerLabelSet
+        flower = PlantVision(num_classes=len(flowerLabelSet))
+        flowerUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower.pt"
+        flowerBytes = BytesIO(requests.get(flowerUrl).content)
+        flower.load_state_dict(torch.load(flowerBytes, map_location=torch.device(device)), strict=False)
+        model = flower
+        labelSet = flowerLabelSet
     elif feature=='leaf':
-         model = leaf
-         labelSet = leafLabelSet
+        leaf = PlantVision(num_classes=len(leafLabelSet))
+        leafUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-leaf.pt"
+        leafBytes = BytesIO(requests.get(leafUrl).content)
+        leaf.load_state_dict(torch.load(leafBytes, map_location=torch.device(device)), strict=False)
+        model = leaf
+        labelSet = leafLabelSet
     elif feature=='fruit':
-         model = fruit
-         labelSet = fruitLabelSet
+        fruit = PlantVision(num_classes=len(fruitLabelSet))
+        fruitUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-fruit.pt"
+        fruitBytes = BytesIO(requests.get(fruitUrl).content)
+        fruit.load_state_dict(torch.load(fruitBytes, map_location=torch.device(device)), strict=False)
+        model = fruit
+        labelSet = fruitLabelSet
 
     with torch.no_grad():
         output = model(tensor.unsqueeze(0))
