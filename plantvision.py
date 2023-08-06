@@ -55,31 +55,20 @@ with open(fr'{THIS_FOLDER}/resources/leafLabelSet.pkl', 'rb') as f:
 with open(fr'{THIS_FOLDER}/resources/fruitLabelSet.pkl', 'rb') as f:
         fruitLabelSet = pkl.load(f)
 
-from concurrent.futures import ThreadPoolExecutor
-
-def download_and_load_model(url, labelSet):
-    response = requests.get(url)
-    modelBytes = BytesIO(response.content)
-    model = PlantVision(num_classes=len(labelSet))
-    model.load_state_dict(torch.load(modelBytes, map_location=torch.device(device)), strict=False)
-    model = model.half()
-    modelBytes = None
-    gc.collect()
-    return model
-
-urls_and_labelsets = [
-    ("https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower-half.pt", flowerLabelSet),
-    ("https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-leaf-half.pt", leafLabelSet),
-    ("https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-fruit-half.pt", fruitLabelSet)
-]
-
 import datetime as dt
-start = dt.datetime.now()
-with ThreadPoolExecutor() as executor:
-    results = list(executor.map(lambda x: download_and_load_model(*x), urls_and_labelsets))
 
-flower, leaf, fruit = results
-print(dt.datetime.now()-start)
+start = dt.datetime.now()
+flowerUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower-half.pt"
+flowerBytes = BytesIO(requests.get(flowerUrl).content)
+flower = PlantVision(num_classes=len(flowerLabelSet))
+flower.load_state_dict(torch.load(flowerBytes, map_location=torch.device(device)), strict=False)
+flower = flower.half()
+flowerBytes = None
+gc.collect()
+print(dt.datetime.now() - start)
+
+leaf = PlantVision(num_classes=len(leafLabelSet))
+fruit = PlantVision(num_classes=len(fruitLabelSet))
 
 def processImage(imagePath, feature):
     with open(fr'{THIS_FOLDER}/resources/{feature}MeansAndStds.pkl', 'rb') as f:
@@ -104,12 +93,30 @@ def see(tensor,feature,k):
     if feature=='flower':
         model = flower.float()
         labelSet = flowerLabelSet
+        
     elif feature=='leaf':
-        model = leaf.float()
+        start = dt.datetime.now()
+        leafUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-leaf-half.pt"
+        leafBytes = BytesIO(requests.get(leafUrl).content)
+        leaf.load_state_dict(torch.load(leafBytes, map_location=torch.device(device)), strict=False)
+        leaf = leaf.half()
+        leafBytes = None
+        gc.collect()
         labelSet = leafLabelSet
+        model = leaf.float()
+        print(dt.datetime.now() - start)
+        
     elif feature=='fruit':
+        start = dt.datetime.now()
+        fruitUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-fruit-half.pt"
+        fruitBytes = BytesIO(requests.get(fruitUrl).content)
+        fruit.load_state_dict(torch.load(fruitBytes, map_location=torch.device(device)), strict=False)
+        fruit = fruit.half()
+        fruitBytes = None
+        gc.collect()
         model = fruit.float()
         labelSet = fruitLabelSet
+        print(dt.datetime.now() - start)
 
     with torch.no_grad():
         output = model(tensor.unsqueeze(0))
