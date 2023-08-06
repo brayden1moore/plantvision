@@ -57,19 +57,6 @@ with open(fr'{THIS_FOLDER}/resources/fruitLabelSet.pkl', 'rb') as f:
 
 import datetime as dt
 
-start = dt.datetime.now()
-flowerUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower-half.pt"
-flowerBytes = BytesIO(requests.get(flowerUrl).content)
-flower = PlantVision(num_classes=len(flowerLabelSet))
-flower.load_state_dict(torch.load(flowerBytes, map_location=torch.device(device)), strict=False)
-flower = flower.half()
-flowerBytes = None
-gc.collect()
-print(dt.datetime.now() - start)
-
-leaf = PlantVision(num_classes=len(leafLabelSet))
-fruit = PlantVision(num_classes=len(fruitLabelSet))
-
 def processImage(imagePath, feature):
     with open(fr'{THIS_FOLDER}/resources/{feature}MeansAndStds.pkl', 'rb') as f:
         meansAndStds = pkl.load(f)
@@ -91,30 +78,41 @@ def processImage(imagePath, feature):
 def see(tensor,feature,k):
 
     if feature=='flower':
-        model = flower.float()
+        start = dt.datetime.now()
+        flowerUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower-half.pt"
+        flowerBytes = BytesIO(requests.get(flowerUrl).content)
+        flower = PlantVision(num_classes=len(flowerLabelSet))
+        flower.load_state_dict(torch.load(flowerBytes, map_location=torch.device(device)), strict=False)
+        #flower = flower.half()
+        flowerBytes = None
+        gc.collect()
+        print(dt.datetime.now() - start)
+        model = flower#.float()
         labelSet = flowerLabelSet
         
     elif feature=='leaf':
         start = dt.datetime.now()
+        leaf = PlantVision(num_classes=len(leafLabelSet))
         leafUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-leaf-half.pt"
         leafBytes = BytesIO(requests.get(leafUrl).content)
         leaf.load_state_dict(torch.load(leafBytes, map_location=torch.device(device)), strict=False)
-        leaf = leaf.half()
+        #leaf = leaf.half()
         leafBytes = None
         gc.collect()
         labelSet = leafLabelSet
-        model = leaf.float()
+        model = leaf#.float()
         print(dt.datetime.now() - start)
         
     elif feature=='fruit':
         start = dt.datetime.now()
+        fruit = PlantVision(num_classes=len(fruitLabelSet))
         fruitUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-fruit-half.pt"
         fruitBytes = BytesIO(requests.get(fruitUrl).content)
         fruit.load_state_dict(torch.load(fruitBytes, map_location=torch.device(device)), strict=False)
-        fruit = fruit.half()
+        #fruit = fruit.half()
         fruitBytes = None
         gc.collect()
-        model = fruit.float()
+        model = fruit#.float()
         labelSet = fruitLabelSet
         print(dt.datetime.now() - start)
 
