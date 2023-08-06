@@ -55,29 +55,31 @@ with open(fr'{THIS_FOLDER}/resources/leafLabelSet.pkl', 'rb') as f:
 with open(fr'{THIS_FOLDER}/resources/fruitLabelSet.pkl', 'rb') as f:
         fruitLabelSet = pkl.load(f)
 
-flowerUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower-half.pt"
-flowerBytes = BytesIO(requests.get(flowerUrl).content)
-flower = PlantVision(num_classes=len(flowerLabelSet))
-flower.load_state_dict(torch.load(flowerBytes, map_location=torch.device(device)), strict=False)
-flower = flower.half()
-flowerBytes = None
-gc.collect()
+from concurrent.futures import ThreadPoolExecutor
 
-leafUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-leaf-half.pt"
-leafBytes = BytesIO(requests.get(leafUrl).content)
-leaf = PlantVision(num_classes=len(leafLabelSet))
-leaf.load_state_dict(torch.load(leafBytes, map_location=torch.device(device)), strict=False)
-leaf = leaf.half()
-leafBytes = None
-gc.collect()
+def download_and_load_model(url, labelSet):
+    response = requests.get(url)
+    modelBytes = BytesIO(response.content)
+    model = PlantVision(num_classes=len(labelSet))
+    model.load_state_dict(torch.load(modelBytes, map_location=torch.device(device)), strict=False)
+    model = model.half()
+    modelBytes = None
+    gc.collect()
+    return model
 
-fruitUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-fruit-half.pt"
-fruitBytes = BytesIO(requests.get(fruitUrl).content)
-fruit = PlantVision(num_classes=len(fruitLabelSet))
-fruit.load_state_dict(torch.load(fruitBytes, map_location=torch.device(device)), strict=False)
-fruit = fruit.half()
-fruitBytes = None
-gc.collect()
+urls_and_labelsets = [
+    ("https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower-half.pt", flowerLabelSet),
+    ("https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-leaf-half.pt", leafLabelSet),
+    ("https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-fruit-half.pt", fruitLabelSet)
+]
+
+import datetime as dt
+start = dt.datetime.now()
+with ThreadPoolExecutor() as executor:
+    results = list(executor.map(lambda x: download_and_load_model(*x), urls_and_labelsets))
+
+flower, leaf, fruit = results
+print(dt.datetime.now()-start)
 
 def processImage(imagePath, feature):
     with open(fr'{THIS_FOLDER}/resources/{feature}MeansAndStds.pkl', 'rb') as f:
