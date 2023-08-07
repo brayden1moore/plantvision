@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const selectedFeature = featureSelect.value;
     const formData = new FormData();
-    thinkingText.innerText = "One sec, thinking...";
+    thinkingText.innerText = "Loading the model, it might take a second...";
     formData.append("uploaded-image", file);
     formData.append("feature", selectedFeature);
     lastUploadedImage = file;
