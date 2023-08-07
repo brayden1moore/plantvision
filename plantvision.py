@@ -55,6 +55,30 @@ with open(fr'{THIS_FOLDER}/resources/leafLabelSet.pkl', 'rb') as f:
 with open(fr'{THIS_FOLDER}/resources/fruitLabelSet.pkl', 'rb') as f:
         fruitLabelSet = pkl.load(f)
 
+
+from concurrent.futures import ThreadPoolExecutor
+
+def loadModel(feature, labelSet):
+    model = PlantVision(num_classes=len(labelSet))
+    model.vitFlatten.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitFlatten-weights.pt").content), map_location=torch.device(device)), strict=False)
+    model.vitLinear.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitLinear-weights.pt").content), map_location=torch.device(device)), strict=False)
+    model.fc.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-fc-weights.pt").content), map_location=torch.device(device)), strict=False)
+    model = model.half()
+    return model
+
+featuresAndLabelSets = [
+    ("flower", flowerLabelSet),
+    ("leaf", leafLabelSet),
+    ("fruit", fruitLabelSet)
+]
+
+start = dt.datetime.now()
+with ThreadPoolExecutor() as executor:
+    results = list(executor.map(lambda x: loadModel(*x), featuresAndLabelSets))
+
+flower, leaf, fruit = results
+print(dt.datetime.now() - start)
+
 def processImage(imagePath, feature):
     with open(fr'{THIS_FOLDER}/resources/{feature}MeansAndStds.pkl', 'rb') as f:
         meansAndStds = pkl.load(f)
@@ -76,20 +100,16 @@ def processImage(imagePath, feature):
 def see(layers, tensor,feature,k):
 
         if feature=='flower':
-                model = PlantVision(num_classes=len(flowerLabelSet))
+                model = flower.float()
                 labelSet = flowerLabelSet
         
         elif feature=='leaf':
-                model = PlantVision(num_classes=len(leafLabelSet))
+                model = leaf.float()
                 labelSet = leafLabelSet
         
         elif feature=='fruit':
-                model = PlantVision(num_classes=len(fruitLabelSet))
+                model = fruit.float()
                 labelSet = fruitLabelSet
-        
-        model.vitFlatten.load_state_dict(torch.load(layers[0], map_location=torch.device(device)), strict=False)
-        model.vitLinear.load_state_dict(torch.load(layers[1], map_location=torch.device(device)), strict=False)
-        model.fc.load_state_dict(torch.load(layers[2], map_location=torch.device(device)), strict=False)
         
         with torch.no_grad():        
                 output = model(tensor.unsqueeze(0))
