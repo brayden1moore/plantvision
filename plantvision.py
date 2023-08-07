@@ -87,7 +87,7 @@ def processImage(imagePath, feature):
 
     return process(cropped)
 
-def see(layers, tensor,feature,k):
+def see(tensor,feature,k):
 
         if feature=='flower':
                 model = flower.float()
