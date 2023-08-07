@@ -8,41 +8,41 @@ import pickle as pkl
 from pathlib import Path
 THIS_FOLDER = Path(__file__).parent.resolve()
 import datetime as dt
-#from transformers import AutoModel
-#import torch.nn as nn
-#import torch.nn.functional as F
-#import logging
-#logging.disable(logging.INFO)
-#logging.disable(logging.WARNING)
+from transformers import AutoModel
+import torch.nn as nn
+import torch.nn.functional as F
+import logging
+logging.disable(logging.INFO)
+logging.disable(logging.WARNING)
 
-#visionTransformer = AutoModel.from_pretrained(r"google/vit-base-patch16-224-in21k")
+visionTransformer = AutoModel.from_pretrained(r"google/vit-base-patch16-224-in21k")
 
-#class PlantVision(nn.Module):
-#    def __init__(self, num_classes):
-#        super(PlantVision, self).__init__()
-#        self.vit = visionTransformer
-#        count = 0
-#        for child in self.vit.children():
-#            count += 1
-#            if count < 4:
-#                for param in child.parameters():
-#                    param.requires_grad = False
-#        self.vitLayers = list(self.vit.children()) 
-#        self.vitTop = nn.Sequential(*self.vitLayers[:-2])
-#        self.vitNorm = list(self.vit.children())[2]
-#        self.vit = None
-#        gc.collect()
-#        self.vitFlatten = nn.Flatten()
-#        self.vitLinear = nn.Linear(151296,num_classes)
-#        self.fc = nn.Linear(num_classes, num_classes)
+class PlantVision(nn.Module):
+    def __init__(self, num_classes):
+        super(PlantVision, self).__init__()
+        self.vit = visionTransformer
+        count = 0
+        for child in self.vit.children():
+            count += 1
+            if count < 4:
+                for param in child.parameters():
+                    param.requires_grad = False
+        self.vitLayers = list(self.vit.children()) 
+        self.vitTop = nn.Sequential(*self.vitLayers[:-2])
+        self.vitNorm = list(self.vit.children())[2]
+        self.vit = None
+        gc.collect()
+        self.vitFlatten = nn.Flatten()
+        self.vitLinear = nn.Linear(151296,num_classes)
+        self.fc = nn.Linear(num_classes, num_classes)
 
-#    def forward(self, input):
-#        output = self.vitTop(input).last_hidden_state
-#        output = self.vitNorm(output)
-#        output = self.vitFlatten(output)
-#        output = F.relu(self.vitLinear(output))
-#        output = self.fc(output)
-#        return output
+    def forward(self, input):
+        output = self.vitTop(input).last_hidden_state
+        output = self.vitNorm(output)
+        output = self.vitFlatten(output)
+        output = F.relu(self.vitLinear(output))
+        output = self.fc(output)
+        return output
 
 device = 'cpu' # ('cuda' if torch.cuda.is_available else 'cpu')
 
@@ -54,12 +54,6 @@ with open(fr'{THIS_FOLDER}/resources/leafLabelSet.pkl', 'rb') as f:
 
 with open(fr'{THIS_FOLDER}/resources/fruitLabelSet.pkl', 'rb') as f:
         fruitLabelSet = pkl.load(f)
-
-import onnxruntime as ort
-
-flower = ort.InferenceSession("plantvision-model-flower-half.onnx")
-leaf = ort.InferenceSession("plantvision-model-leaf-half.onnx")
-fruit = ort.InferenceSession("plantvision-model-fruit-half.onnx")
 
 def processImage(imagePath, feature):
     with open(fr'{THIS_FOLDER}/resources/{feature}MeansAndStds.pkl', 'rb') as f:
@@ -81,59 +75,43 @@ def processImage(imagePath, feature):
 
 def see(tensor,feature,k):
 
-    if feature=='flower':
-        #start = dt.datetime.now()
-        #flowerUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-flower-half.pt"
-        #flowerBytes = BytesIO(requests.get(flowerUrl).content)
-        #flower = PlantVision(num_classes=len(flowerLabelSet))
-        #flower.load_state_dict(torch.load(flowerBytes, map_location=torch.device(device)), strict=False)
-        #flower = flower.half()
-        #flowerBytes = None
-        #gc.collect()
-        #model = flower#.float()
-        #print(dt.datetime.now() - start)
-        model = flower
-        labelSet = flowerLabelSet
+        if feature=='flower':
+                model = PlantVision(num_classes=len(flowerLabelSet))
+                labelSet = flowerLabelSet
         
-    elif feature=='leaf':
-        #start = dt.datetime.now()
-        #leaf = PlantVision(num_classes=len(leafLabelSet))
-        #leafUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-leaf-half.pt"
-        #leafBytes = BytesIO(requests.get(leafUrl).content)
-        #leaf.load_state_dict(torch.load(leafBytes, map_location=torch.device(device)), strict=False)
-        #leaf = leaf.half()
-        #leafBytes = None
-        #gc.collect()
-        #model = leaf#.float()
-        #print(dt.datetime.now() - start)
-        model = leaf
-        labelSet = leafLabelSet
+        elif feature=='leaf':
+                model = PlantVision(num_classes=len(leafLabelSet))
+                labelSet = leafLabelSet
         
-    elif feature=='fruit':
-        #start = dt.datetime.now()
-        #fruit = PlantVision(num_classes=len(fruitLabelSet))
-        #fruitUrl = "https://storage.googleapis.com/bmllc-plant-model-bucket/plantvision-model-fruit-half.pt"
-        #fruitBytes = BytesIO(requests.get(fruitUrl).content)
-        #fruit.load_state_dict(torch.load(fruitBytes, map_location=torch.device(device)), strict=False)
-        #fruit = fruit.half()
-        #fruitBytes = None
-        #gc.collect()
-        #model = fruit#.float()
-        #print(dt.datetime.now() - start)
-        model = fruit
-        labelSet = fruitLabelSet
+        elif feature=='fruit':
+                model = PlantVision(num_classes=len(fruitLabelSet))
+                labelSet = fruitLabelSet
+        
+        start = dt.datetime.now()
+        vitFlatten = BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitFlatten-weights.pt").content)
+        vitLinear = BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitLinear-weights.pt").content)
+        fc = BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-fc-weights.pt").content)
+                            
+        model.vitFlatten.load_state_dict(torch.load(vitFlatten, map_location=torch.device(device)), strict=False)
+        model.vitLinear.load_state_dict(torch.load(vitLinear, map_location=torch.device(device)), strict=False)
+        model.fc.load_state_dict(torch.load(fc, map_location=torch.device(device)), strict=False)
+        model = model.float()
+        
+        vitFlatten = None
+        vitLinear = None
+        fc = None
+        gc.collect()
+        print(dt.datetime.now() - start)
 
-    with torch.no_grad():        
-        #output = model(tensor.unsqueeze(0))
-        input = {'input.1':[tensor]}
-        output = torch.tensor(ort_session.run(None, input)[0])
-        top = torch.topk(output,k,dim=1)
-        predictions = top.indices[0]
-
+        with torch.no_grad():        
+                output = model(tensor.unsqueeze(0))
+                top = torch.topk(output,k,dim=1)
+                predictions = top.indices[0]
+        
         predictedSpecies = []
         for i in predictions:
-            predictedSpecies.append(labelSet[i])
-
+                predictedSpecies.append(labelSet[i])
+        
         model = None
         gc.collect()
         return predictedSpecies
