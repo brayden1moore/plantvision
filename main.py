@@ -14,21 +14,43 @@ app.template_folder = os.path.abspath(f'{THIS_FOLDER}/web/templates')
 app.static_folder = os.path.abspath(f'{THIS_FOLDER}/web/static')
 print(app.static_folder)
 
+flowerLayers = None
+leafLayers = None
+fruitLayers = None
+
 @app.route('/')
 def home():
     return render_template('index.html')
 
 @app.route('/guess', methods=['POST'])
 def guess():
+    global flowerLayers, leafLayers, fruitLayers
 
-    session['sessionId'] = random.random()*100
     if request.method == 'POST':
         print('Thinking...')
         img = request.files.get('uploaded-image')
         feature = request.form.get('feature')
 
+        if (feature == 'flower' and flowerLayers==None) or (feature == 'leaf' and leafLayers==None) or (feature == 'fruit' and fruitLayers==None):
+                layerBytes = [BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitFlatten-weights.pt").content),
+                             BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitLinear-weights.pt").content),
+                             BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-fc-weights.pt").content)]
+                if feature == 'flower':
+                             flowerLayers = layerBytes
+                if feature == 'leaf':
+                             leafLayers = layerBytes
+                if feature == 'fruit':
+                             fruitLayers = layerBytes
+
+        if feature == 'flower':
+                     layers = flowerLayers
+        if feature == 'leaf':
+                     layers = leafLayers
+        if feature == 'fruit':
+                     layers = fruitLayers
+        
         tensor = plantvision.processImage(img, feature)
-        predictions = plantvision.see(tensor, feature, 6)
+        predictions = plantvision.see(layers, tensor, feature, 6)
 
         with open(f'{THIS_FOLDER}/resources/speciesNameToKey.pkl','rb') as f:
             speciesNameToKey = pkl.load(f)
