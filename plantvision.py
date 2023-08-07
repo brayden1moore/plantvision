@@ -55,27 +55,6 @@ with open(fr'{THIS_FOLDER}/resources/leafLabelSet.pkl', 'rb') as f:
 with open(fr'{THIS_FOLDER}/resources/fruitLabelSet.pkl', 'rb') as f:
         fruitLabelSet = pkl.load(f)
 
-flower = PlantVision(num_classes=len(flowerLabelSet))  
-feature = 'flower'
-flower.vitFlatten.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitFlatten-weights.pt").content), map_location=torch.device(device)), strict=False)
-flower.vitLinear.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitLinear-weights.pt").content), map_location=torch.device(device)), strict=False)
-flower.fc.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-fc-weights.pt").content), map_location=torch.device(device)), strict=False)
-flower = flower.half()
-
-leaf = PlantVision(num_classes=len(leafLabelSet))  
-feature = 'leaf'
-leaf.vitFlatten.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitFlatten-weights.pt").content), map_location=torch.device(device)), strict=False)
-leaf.vitLinear.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitLinear-weights.pt").content), map_location=torch.device(device)), strict=False)
-leaf.fc.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-fc-weights.pt").content), map_location=torch.device(device)), strict=False)
-leaf = leaf.half()
-
-fruit = PlantVision(num_classes=len(fruitLabelSet))  
-feature = 'fruit'
-fruit.vitFlatten.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitFlatten-weights.pt").content), map_location=torch.device(device)), strict=False)
-fruit.vitLinear.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitLinear-weights.pt").content), map_location=torch.device(device)), strict=False)
-fruit.fc.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-fc-weights.pt").content), map_location=torch.device(device)), strict=False)
-fruit = fruit.half()
-
 def processImage(imagePath, feature):
     with open(fr'{THIS_FOLDER}/resources/{feature}MeansAndStds.pkl', 'rb') as f:
         meansAndStds = pkl.load(f)
@@ -94,19 +73,23 @@ def processImage(imagePath, feature):
 
     return process(cropped)
 
-def see(tensor,feature,k):
+def see(layers, tensor,feature,k):
 
         if feature=='flower':
-                model = flower.float()
+                model = PlantVision(num_classes=len(flowerLabelSet))
                 labelSet = flowerLabelSet
         
         elif feature=='leaf':
-                model = leaf.float()
+                model = PlantVision(num_classes=len(leafLabelSet))
                 labelSet = leafLabelSet
         
         elif feature=='fruit':
-                model = fruit.float()
+                model = PlantVision(num_classes=len(fruitLabelSet))
                 labelSet = fruitLabelSet
+        
+        model.vitFlatten.load_state_dict(torch.load(layers[0], map_location=torch.device(device)), strict=False)
+        model.vitLinear.load_state_dict(torch.load(layers[1], map_location=torch.device(device)), strict=False)
+        model.fc.load_state_dict(torch.load(layers[2], map_location=torch.device(device)), strict=False)
         
         with torch.no_grad():        
                 output = model(tensor.unsqueeze(0))
