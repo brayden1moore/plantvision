@@ -1,4 +1,6 @@
 import plantvision
+import requests
+from io import BytesIO
 import pickle as pkl
 from flask import Flask, render_template, request, session, jsonify, url_for
 from PIL import Image
