@@ -55,9 +55,6 @@ with open(fr'{THIS_FOLDER}/resources/leafLabelSet.pkl', 'rb') as f:
 with open(fr'{THIS_FOLDER}/resources/fruitLabelSet.pkl', 'rb') as f:
         fruitLabelSet = pkl.load(f)
 
-
-from concurrent.futures import ThreadPoolExecutor
-
 def loadModel(feature, labelSet):
     model = PlantVision(num_classes=len(labelSet))
     model.vitFlatten.load_state_dict(torch.load(BytesIO(requests.get(f"https://storage.googleapis.com/bmllc-plant-model-bucket/{feature}-vitFlatten-weights.pt").content), map_location=torch.device(device)), strict=False)
@@ -66,17 +63,10 @@ def loadModel(feature, labelSet):
     model = model.half()
     return model
 
-featuresAndLabelSets = [
-    ("flower", flowerLabelSet),
-    ("leaf", leafLabelSet),
-    ("fruit", fruitLabelSet)
-]
-
 start = dt.datetime.now()
-with ThreadPoolExecutor() as executor:
-    results = list(executor.map(lambda x: loadModel(*x), featuresAndLabelSets))
-
-flower, leaf, fruit = results
+flower = loadModel('flower',flowerLabelSet)
+leaf = loadModel('leaf',leafLabelSet)
+fruit = loadModel('fruit',fruitLabelSet)
 print(dt.datetime.now() - start)
 
 def processImage(imagePath, feature):
